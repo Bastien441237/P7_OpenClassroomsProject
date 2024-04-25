@@ -7,6 +7,11 @@ import matplotlib.image as mpimg
 from PIL import Image
 import random
 import tensorflow as tf
+from keras.preprocessing.image import load_img, img_to_array
+from keras.preprocessing import image as kimage
+import pickle
+import numpy as np
+import subprocess
 
 # Chemin vers le répertoire d'images
 # images_dir = "C:\\Users\\Basti\\Projets Python\\Machine Learning Engineer\\P7\\Images"
@@ -33,7 +38,22 @@ page = st.sidebar.radio("Aller à la page :", pages)
 model_path_vgg16 = 'model_vgg16.h5'
 model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
 
-model_path_yolov9 = 'best.pt'
+model_dir = 'yolov9_model'
+model_filename = 'best.pt'
+model_path_yolov9 = os.path.join(model_dir, model_filename)
+
+# Chargement des labels
+with open('index_to_class.pkl', 'rb') as file:
+    classes_labels = pickle.load(file)
+
+# Fonction pour charger et redimensionner les images
+def load_and_resize_image(image_path, target_size):
+    img = load_img(image_path, target_size=target_size)
+    img_array = img_to_array(img)
+    return img_array
+
+# Dossier contenant les images de test par race de chiens
+data_test_dir = 'Data_test'
 
 # Classes sélectionnées
 selection_classes = ['Bernese_mountain_dog', 'boxer', 'briard',
@@ -241,4 +261,75 @@ elif page == pages[3]:
     img = Image.open(img4)
     # Afficher l'image dans Streamlit
     st.image(img, width=900)
-    
+    # Modèle YOLOV9 sur les images détourées
+    st.write('### Modèle YOLOV9 sur les images détourées')
+    st.write('#### Evaluation du modèle')
+    # Chemin d'accès de l'évaluation YOLOV9
+    img5 = "./Images_streamlit/YOLOV9_results_2.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img5)
+    # Afficher l'image dans Streamlit
+    st.image(img, width=800)
+    st.write('#### Matrice de confusion sur les données de test')
+    # Chemin d'accès de la matrice de confusion YOLOV9
+    img6 = "./Images_streamlit/YOLOV9_confusion_matrix_2.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img6)
+    # Afficher l'image dans Streamlit
+    st.image(img, width=900)
+    st.write('### Conclusion')
+    st.write("Le modèle YOLOV9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
+             Il est également intéressant de noter que ce modèle obtient de meilleurs résultats sur les données de test.")
+
+    # Liste des races de chiens disponibles
+    dog_breeds = os.listdir(data_test_dir)
+
+    # Sidebar pour choisir le nombre d'images par race de chiens
+    num_images_per_breed = st.sidebar.selectbox("Nombre d'images par race de chiens :", [1, 2, 3, 4, 5])
+
+    # Bouton pour déclencher les prédictions
+    if st.sidebar.button('Prédire'):
+        for breed in dog_breeds:
+            st.write(f"##### Race de chien : {breed}")
+            breed_dir = os.path.join(data_test_dir, breed)
+            if os.path.isdir(breed_dir):
+                breed_images = os.listdir(breed_dir)[:num_images_per_breed]
+                for image_name in breed_images:
+                    image_path = os.path.join(breed_dir, image_name)
+                    
+                    # Charger l'image
+                    with open(image_path, 'rb') as f:
+                        image = Image.open(f)
+                    
+                    # Charger, redimensionner et normaliser l'image
+                    img = kimage.load_img(image_path, target_size=(224, 224))
+                    img = kimage.img_to_array(img)
+                    img = np.expand_dims(img, axis=0)
+                    img = img / 255.0
+
+                    ## Utiliser le modèle YOLOV9
+                    # detect_yolov9 = '.\yolov9_model\detect.py'
+                    # yolo_command = f"python detect.py --img 640 --device cpu --weights {model_path_yolov9} --source {image_path} --nosave --save-txt"
+                    # yolo_output = subprocess.check_output(yolo_command, shell=True, text=True)
+                    
+                    # Faire des prédictions avec le modèle VGG16
+                    prediction = model_vgg16.predict(img)
+                    
+                    # Obtenir la classe prédite et la probabilité du modèle VGG16
+                    max_index = np.argmax(prediction)
+                    max_label = classes_labels[max_index]
+                    max_proba = prediction[0][max_index]
+                    
+                    # Afficher la prédiction et la probabilité du modèle VGG16
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        with open(image_path, 'rb') as f:
+                            image = Image.open(f)
+                            st.image(image, width=150)
+                            st.write("Prédiction YOLOv9:")
+                            st.write("AR")  # Afficher la prédiction de YOLOv9
+                    with col2:
+                        st.write(f"Race prédite par le modèle VGG16 **{max_label}** avec une probabilité de : **{max_proba:.2f}**")
+
+elif page == pages[4]:
+    st.title("Prédiction du modèle")
