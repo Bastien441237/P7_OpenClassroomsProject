@@ -15,7 +15,7 @@ import subprocess
 
 # Chemin vers le répertoire d'images
 # images_dir = "C:\\Users\\Basti\\Projets Python\\Machine Learning Engineer\\P7\\Images"
-images_dir = ".\Images"
+images_dir = os.path.join('Images')
 
 # Boucle pour récupérer les noms d'images et les labels
 image_files = []
