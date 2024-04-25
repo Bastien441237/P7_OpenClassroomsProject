@@ -6,6 +6,7 @@ import seaborn as sns
 import matplotlib.image as mpimg
 from PIL import Image
 import random
+import tensorflow as tf
 
 # Chemin vers le répertoire d'images
 # images_dir = "C:\\Users\\Basti\\Projets Python\\Machine Learning Engineer\\P7\\Images"
@@ -27,6 +28,19 @@ sample_df = df_dogs.sample(10)
 st.sidebar.title("Sommaire")
 pages = ['Contexte du projet', 'Analyse exploratoire des données', 'Nettoyage des données', 'Choix du modèle', 'Prédiction du modèle']
 page = st.sidebar.radio("Aller à la page :", pages)
+
+# Chargement des modèles
+model_path_vgg16 = 'model_vgg16.h5'
+model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
+
+model_path_yolov9 = 'best.pt'
+
+# Classes sélectionnées
+selection_classes = ['Bernese_mountain_dog', 'boxer', 'briard',
+                    'Brittany_spaniel', 'bull_mastiff', 'Doberman',
+                    'EntleBucher', 'French_bulldog', 'Gordon_setter',
+                    'Greater_Swiss_Mountain_dog', 'Irish_setter', 'Rottweiler',
+                    'Samoyed', 'Tibetan_terrier', 'vizsla']
 
 if page == pages[0]:
     st.title("Contexte du projet")
@@ -90,11 +104,7 @@ elif page == pages[2]:
     st.title('Nettoyage des données')
     st.write("Nous allons d'abord choisir 15 races de chiens afin de réduire le temps de calcul.")
     # Liste des étiquettes sélectionnées
-    selected_dirs = ['Bernese_mountain_dog', 'boxer', 'briard',
-                    'Brittany_spaniel', 'bull_mastiff', 'Doberman',
-                    'EntleBucher', 'French_bulldog', 'Gordon_setter',
-                    'Greater_Swiss_Mountain_dog', 'Irish_setter', 'Rottweiler',
-                    'Samoyed', 'Tibetan_terrier', 'vizsla']
+    selected_dirs = selection_classes
 
     # Section pour la sélection de données en entrée du moteur de prédiction
     st.write("## Sélection de données en entrée")
@@ -129,7 +139,7 @@ elif page == pages[2]:
     # Charger l'image à partir du chemin d'accès
     img = Image.open(image_path)
     # Afficher l'image dans Streamlit
-    st.image(img, caption='Image', width=300)
+    st.image(img, width=300)
 
     # Affichage des images originales
     st.write("Puis, nous avons utilisé ces détections pour ne garder que les détections de chiens dans les images. \
@@ -196,3 +206,39 @@ elif page == pages[2]:
 elif page == pages[3]:
     # Titre de la page
     st.title('Choix du modèle')
+    st.write('### Modèle VGG16 baseline')
+    st.write("Pour le modèle baseline nous avons choisi le modèle VGG16 qui a été entraîné sur les données d'ImageNet. \
+             Ici, notre DataSet est composé de données d'ImageNet, cela permettra donc d'avoir une bonne base pour la classification \
+             des images de races de chiens. Nous avons entraîné ce modèle préentraîné sur les images brutes, c'est-à-dire \
+             non nettoyées.")
+    # Chemin d'accès de l'évaluation VGG16
+    img1 = "./Images_streamlit/VGG16_evaluate.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img1)
+    st.write('#### Evaluation du modèle')
+    # Afficher l'image dans Streamlit
+    st.image(img, width=800)
+    st.write('#### Matrice de confusion sur les données de test')
+    # Chemin d'accès de la matrice de confusion VGG16
+    img2 = "./Images_streamlit/VGG16_confusion_matrix.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img2)
+    # Afficher l'image dans Streamlit
+    st.image(img, width=800)
+    # Modèle YOLOV9 sur les images non détourées
+    st.write('### Modèle YOLOV9 sur les images non détourées')
+    st.write('#### Evaluation du modèle')
+    # Chemin d'accès de l'évaluation YOLOV9
+    img3 = "./Images_streamlit/YOLOV9_results_1.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img3)
+    # Afficher l'image dans Streamlit
+    st.image(img, width=800)
+    st.write('#### Matrice de confusion sur les données de test')
+    # Chemin d'accès de la matrice de confusion YOLOV9
+    img4 = "./Images_streamlit/YOLOV9_confusion_matrix_1.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img4)
+    # Afficher l'image dans Streamlit
+    st.image(img, width=900)
+    
