@@ -52,7 +52,7 @@ def load_and_resize_image(image_path, target_size):
     return img_array
 
 # Dossier contenant les images de test par race de chiens
-data_test_dir = 'Data_test'
+data_test_dir = os.path.join('Data_test')
 
 # Classes sélectionnées
 selection_classes = ['Bernese_mountain_dog', 'boxer', 'briard',
