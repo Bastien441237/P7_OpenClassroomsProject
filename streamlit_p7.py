@@ -28,7 +28,6 @@ for root, dirs, images in os.walk(images_dir):
 
 # Mise en place des DataFrames
 df_dogs = pd.DataFrame({'image_path': image_files, 'label': labels})
-sample_df = df_dogs.sample(10)
 
 st.sidebar.title("Sommaire")
 pages = ['Contexte du projet', 'Analyse exploratoire des données', 'Nettoyage des données', 'Choix du modèle', 'Prédiction du modèle']
@@ -78,18 +77,6 @@ elif page == pages[1]:
     plt.xlabel("Nombre d'images")
     plt.ylabel('Labels')
     plt.title("Nombre d'images par label", fontdict={'fontweight':'bold', 'fontsize':15})
-    plt.tight_layout()
-    st.pyplot(plt)
-
-    # Afficher les images et leurs étiquettes
-    st.write("#### Images aléatoires et leurs étiquettes")
-    plt.figure(figsize=(12, 5))
-    for i in range(10):
-        plt.subplot(2, 5, i + 1)
-        img = mpimg.imread(sample_df.iloc[i]['image_path'])
-        plt.imshow(img)
-        plt.title(sample_df.iloc[i]['label'], fontdict={'fontweight':'bold'})
-        plt.axis('off')  # Supprimer les axes
     plt.tight_layout()
     st.pyplot(plt)
 
