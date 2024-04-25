@@ -29,10 +29,10 @@ pages = ['Contexte du projet', 'Analyse exploratoire des données', 'Nettoyage d
 page = st.sidebar.radio("Aller à la page :", pages)
 
 if page == pages[0]:
-    st.write("### Contexte du projet")
+    st.title("Contexte du projet")
 
 elif page == pages[1]:
-    st.write('### Analyse exploratoire des données')
+    st.title('Analyse exploratoire des données')
 
     # Grouper et compter le nombre d'images par étiquette
     nb = df_dogs.groupby("label").count().sort_values(by="image_path", ascending=False)
@@ -86,6 +86,8 @@ elif page == pages[1]:
         st.write("Aucune étiquette sélectionnée. Veuillez en sélectionner au moins une dans la barre latérale.")
 
 elif page == pages[2]:
+    # Titre de la page
+    st.title('Nettoyage des données')
     st.write("Nous allons d'abord choisir 15 races de chiens afin de réduire le temps de calcul.")
     # Liste des étiquettes sélectionnées
     selected_dirs = ['Bernese_mountain_dog', 'boxer', 'briard',
@@ -190,3 +192,7 @@ elif page == pages[2]:
                 img = Image.open(image_path)
                 with col3:
                     st.image(img, caption=f"Image {index+1}", width=150)
+
+elif page == pages[3]:
+    # Titre de la page
+    st.title('Choix du modèle')
