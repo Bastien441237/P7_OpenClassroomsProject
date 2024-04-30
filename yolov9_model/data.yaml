@@ -1,0 +1,20 @@
+train: "C:\\Users\\Basti\\Projets Python\\Machine Learning Engineer\\P7\\split_dogs_cutout_15\\train\\images"
+val : "C:\\Users\\Basti\\Projets Python\\Machine Learning Engineer\\P7\\split_dogs_cutout_15\\validation\\images"
+
+nc: 15
+
+names: ['Bernese_mountain_dog',
+ 'boxer',
+ 'briard',
+ 'Brittany_spaniel',
+ 'bull_mastiff',
+ 'Doberman',
+ 'EntleBucher',
+ 'French_bulldog',
+ 'Gordon_setter',
+ 'Greater_Swiss_Mountain_dog',
+ 'Irish_setter',
+ 'Rottweiler',
+ 'Samoyed',
+ 'Tibetan_terrier',
+ 'vizsla']
