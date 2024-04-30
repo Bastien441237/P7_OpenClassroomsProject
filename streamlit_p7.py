@@ -37,7 +37,7 @@ page = st.sidebar.radio("Aller à la page :", pages)
 model_path_vgg16 = 'model_vgg16.h5'
 model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
 
-model_dir = 'yolov9_model'
+model_dir = './yolov9_model'
 model_filename = 'best.pt'
 model_path_yolov9 = os.path.join(model_dir, model_filename)
 
