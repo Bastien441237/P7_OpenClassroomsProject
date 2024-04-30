@@ -67,6 +67,7 @@ if page == pages[0]:
 elif page == pages[1]:
     st.title('Analyse exploratoire des données')
 
+    st.write("### Nombre d'images par labels")
     # Grouper et compter le nombre d'images par étiquette
     nb = df_dogs.groupby("label").count().sort_values(by="image_path", ascending=False)
 
@@ -81,9 +82,9 @@ elif page == pages[1]:
     st.pyplot(plt)
 
     # Section pour la sélection de données en entrée du moteur de prédiction
-    st.write("## Sélection de données en entrée")
-    selected_labels = st.multiselect("Sélectionner les étiquettes :", df_dogs['label'].unique())
-    num_images_per_label = st.slider("Nombre d'images par étiquette :", 1, 10, 3)
+    st.write("### Visualisation d'images disponible dans le Stanford  Dogs Dataset")
+    selected_labels = st.multiselect("Sélectionner les labels :", df_dogs['label'].unique())
+    num_images_per_label = st.slider("Nombre d'images par labels :", 1, 10, 3)
 
     # Filtrer le DataFrame en fonction des étiquettes sélectionnées
     filtered_df = df_dogs[df_dogs['label'].isin(selected_labels)]
@@ -109,12 +110,15 @@ elif page == pages[1]:
 elif page == pages[2]:
     # Titre de la page
     st.title('Nettoyage des données')
-    st.write("Nous allons d'abord choisir 15 races de chiens afin de réduire le temps de calcul.")
+    st.write("Nous allons d'abord choisir 15 races de chiens afin de réduire le temps de calcul. \
+             Dans ces 15 races de chiens, nous allons choisir volontairement des races similaires \
+             où de nombreux modèles rencontrent habituellement des problèmes. Le but est de pouvoir avoir un \
+             échantillon représentatif des scores que l'on pourrait obtenir sur l'ensemble du Stanford Dogs Dataset.")
     # Liste des étiquettes sélectionnées
     selected_dirs = selection_classes
 
-    # Section pour la sélection de données en entrée du moteur de prédiction
-    st.write("## Sélection de données en entrée")
+    # Section pour la sélection des échantillons de races de chiens
+    st.write("### Visualisation d'images sur les 15 races de chiens")
     selected_labels = st.multiselect("Sélectionner les étiquettes :", selected_dirs)
     num_images_per_label = st.slider("Nombre d'images par étiquette :", 1, 10, 3)
 
@@ -139,6 +143,8 @@ elif page == pages[2]:
     else:
         st.write("Aucune étiquette sélectionnée. Veuillez en sélectionner au moins une dans la barre latérale.")
 
+    # Section sur l'explication de l'utilisation de YOLOV9 dans le nettoyage du Dataset
+    st.write("### Identification des chiens avec YOLOV9")
     st.write("Nous avons ensuite utilisé YOLOV9 afin de pouvoir identifier si des chiens étaient présents sur les images.\
               En effet, il est possible d'avoir des humains, d'autres animaux ou bien même des objets sur les photos.")
     # Chemin d'accès de l'image
@@ -184,9 +190,11 @@ elif page == pages[2]:
                 with col3:
                     st.image(img, caption=f"Image {index+1}", width=150)
 
+    # Section sur l'explication de l'utilisation de RMBG 1.4 de BRIA AI dans le nettoyage du Dataset
+    st.write("### Réduction du bruit via RMBG 1.4 de BRIA AI")
     # Affichage des images détourées
     st.write("Puis, pour enlever un maximum de bruit sur l'image, nous avons choisis d'utiliser le modèle de Bria AI (RMBG 1.4) \
-            qui permet de détourer l'image. Voici quelques images après traitement :")
+            qui permet de détourer l'image. Ci-dessous, les images recadrées et détourées:")
     # Chemin du dossier contenant les images détourées
     images_cutout_dir = "./dogs_cutout_15"
 
@@ -214,17 +222,21 @@ elif page == pages[3]:
     # Titre de la page
     st.title('Choix du modèle')
     st.write('### Modèle VGG16 baseline')
-    st.write("Pour le modèle baseline nous avons choisi le modèle VGG16 qui a été entraîné sur les données d'ImageNet. \
-             Ici, notre DataSet est composé de données d'ImageNet, cela permettra donc d'avoir une bonne base pour la classification \
-             des images de races de chiens. Nous avons entraîné ce modèle préentraîné sur les images brutes, c'est-à-dire \
-             non nettoyées.")
+    st.write("Pour notre modèle de base, nous avons opté pour le modèle VGG16, \
+             qui a été préalablement entraîné sur les données d'ImageNet. \
+             Notre ensemble de données est également issu d'ImageNet, \
+             ce qui constitue une base solide pour la classification des \
+             différentes races de chiens. Nous avons entraîné ce modèle \
+             pré-entraîné sur les images brutes, c'est-à-dire non nettoyées. \
+             Mais nous avons utilisé les couches d'input de VGG16 pour \
+             le preprocessing de celles-ci.")
     # Chemin d'accès de l'évaluation VGG16
     img1 = "./Images_streamlit/VGG16_evaluate.png"
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img1)
     st.write('#### Evaluation du modèle')
     # Afficher l'image dans Streamlit
-    st.image(img, width=800)
+    st.image(img, width=1000)
     st.write('#### Matrice de confusion sur les données de test')
     # Chemin d'accès de la matrice de confusion VGG16
     img2 = "./Images_streamlit/VGG16_confusion_matrix.png"
@@ -240,14 +252,14 @@ elif page == pages[3]:
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img3)
     # Afficher l'image dans Streamlit
-    st.image(img, width=800)
+    st.image(img, width=900)
     st.write('#### Matrice de confusion sur les données de test')
     # Chemin d'accès de la matrice de confusion YOLOV9
     img4 = "./Images_streamlit/YOLOV9_confusion_matrix_1.png"
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img4)
     # Afficher l'image dans Streamlit
-    st.image(img, width=900)
+    st.image(img, width=1000)
     # Modèle YOLOV9 sur les images détourées
     st.write('### Modèle YOLOV9 sur les images détourées')
     st.write('#### Evaluation du modèle')
@@ -256,14 +268,14 @@ elif page == pages[3]:
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img5)
     # Afficher l'image dans Streamlit
-    st.image(img, width=800)
+    st.image(img, width=900)
     st.write('#### Matrice de confusion sur les données de test')
     # Chemin d'accès de la matrice de confusion YOLOV9
     img6 = "./Images_streamlit/YOLOV9_confusion_matrix_2.png"
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img6)
     # Afficher l'image dans Streamlit
-    st.image(img, width=900)
+    st.image(img, width=1000)
     st.write('### Conclusion')
     st.write("Le modèle YOLOV9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
              Il est également intéressant de noter que ce modèle obtient de meilleurs résultats sur les données de test.")
@@ -364,23 +376,24 @@ elif page == pages[4]:
         image_placeholder = st.empty()
         image_placeholder.image(image, caption=selected_image, use_column_width=True)
         
-        if st.button("Prédire avec YOLOV9"):
-            # Redimensionner et normaliser l'image
-            img = kimage.load_img(image_path, target_size=(224, 224))
-            img = kimage.img_to_array(img)
-            img = np.expand_dims(img, axis=0)
-            img = img / 255.0
+        if st.button("Prédire avec YOLOV9"): 
+            with st.spinner('Prédiction en cours...'):
+                # Redimensionner et normaliser l'image
+                img = kimage.load_img(image_path, target_size=(224, 224))
+                img = kimage.img_to_array(img)
+                img = np.expand_dims(img, axis=0)
+                img = img / 255.0
 
-            # Utiliser le modèle YOLOV9
-            detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-            yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
-            yolo_output = subprocess.check_output(yolo_command)
+                # Utiliser le modèle YOLOV9
+                detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
+                yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+                yolo_output = subprocess.check_output(yolo_command)
 
-            # Afficher l'image avec la boîte de prédiction
-            image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp3', selected_image)
-            with open(image_yolo_path, 'rb') as f:
-                image2 = Image.open(f)
-                image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
+                # Afficher l'image avec la boîte de prédiction
+                image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp2', selected_image)
+                with open(image_yolo_path, 'rb') as f:
+                    image2 = Image.open(f)
+                    image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
             exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
@@ -395,33 +408,31 @@ elif page == pages[4]:
         st.subheader("Veuillez charger votre image ci-dessous :")
         upload = st.file_uploader("Charger l'image du chien :", type=['png', 'jpeg', 'jpg'])
         if upload:
-            # Enregistrer l'image téléchargée dans le dossier spécifié
+            # Enregistrer l'image téléchargée dans un dossier créé à cet effet
             save_folder = os.path.join('yolov9_model', 'runs', 'detect', 'exp2')
+            os.makedirs(save_folder, exist_ok=True)
             save_path = os.path.join(save_folder, upload.name)
             with open(save_path, 'wb') as f:
                 f.write(upload.read())
-            
-            # Afficher l'image
-            image = Image.open(upload)
-            image_placeholder = st.empty()
-            image_placeholder.image(image, caption="Image uploadée", use_column_width=True)
 
-            # Redimensionner et normaliser l'image
-            img = kimage.load_img(image, target_size=(224, 224))
-            img = kimage.img_to_array(img)
-            img = np.expand_dims(img, axis=0)
-            img = img / 255.0
+            with st.spinner('Prédiction en cours...'):
+                # Redimensionner et normaliser l'image
+                img = kimage.load_img(save_path, target_size=(224, 224))
+                img = kimage.img_to_array(img)
+                img = np.expand_dims(img, axis=0)
+                img = img / 255.0
 
-            # Utiliser le modèle YOLOV9
-            detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-            yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {upload}"
-            yolo_output = subprocess.check_output(yolo_command)
+                # Utiliser le modèle YOLOV9
+                detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
+                yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {save_path}"
+                yolo_output = subprocess.check_output(yolo_command)
 
-            # Afficher l'image avec la boîte de prédiction
-            image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp3', selected_image)
-            with open(image_yolo_path, 'rb') as f:
-                image2 = Image.open(f)
-                image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
+                # Afficher l'image avec la boîte de prédiction
+                image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp3', upload.name)
+                with open(image_yolo_path, 'rb') as f:
+                    image2 = Image.open(f)
+                    image_placeholder = st.empty()
+                    image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
             exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
