@@ -321,7 +321,7 @@ elif page == pages[3]:
 
                         # Utiliser le modèle YOLOV9
                         detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-                        yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+                        yolo_command = f"python3 {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
                         yolo_output = subprocess.check_output(yolo_command)
                         
                         # Faire des prédictions avec le modèle VGG16
@@ -386,7 +386,7 @@ elif page == pages[4]:
 
                 # Utiliser le modèle YOLOV9
                 detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-                yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+                yolo_command = f"python3 {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
                 yolo_output = subprocess.check_output(yolo_command)
 
                 # Afficher l'image avec la boîte de prédiction
@@ -424,7 +424,7 @@ elif page == pages[4]:
 
                 # Utiliser le modèle YOLOV9
                 detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-                yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {save_path}"
+                yolo_command = f"python3 {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {save_path}"
                 yolo_output = subprocess.check_output(yolo_command)
 
                 # Afficher l'image avec la boîte de prédiction
