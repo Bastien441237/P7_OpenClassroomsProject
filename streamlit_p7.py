@@ -12,9 +12,9 @@ from keras.preprocessing import image as kimage
 import pickle
 import numpy as np
 import subprocess
+import shutil
 
 # Chemin vers le répertoire d'images
-# images_dir = "C:\\Users\\Basti\\Projets Python\\Machine Learning Engineer\\P7\\Images"
 images_dir = os.path.join('Images')
 
 # Boucle pour récupérer les noms d'images et les labels
@@ -271,52 +271,164 @@ elif page == pages[3]:
     # Liste des races de chiens disponibles
     dog_breeds = os.listdir(data_test_dir)
 
+    # Titre pour les paramètres de prédiction test
+    st.sidebar.title("Choix des paramètres de prédiction test :")
+
     # Sidebar pour choisir le nombre d'images par race de chiens
     num_images_per_breed = st.sidebar.selectbox("Nombre d'images par race de chiens :", [1, 2, 3, 4, 5])
 
-    # Bouton pour déclencher les prédictions
-    if st.sidebar.button('Prédire'):
-        for breed in dog_breeds:
-            st.write(f"##### Race de chien : {breed}")
-            breed_dir = os.path.join(data_test_dir, breed)
-            if os.path.isdir(breed_dir):
-                breed_images = os.listdir(breed_dir)[:num_images_per_breed]
-                for image_name in breed_images:
-                    image_path = os.path.join(breed_dir, image_name)
-                    
-                    # Charger l'image
-                    with open(image_path, 'rb') as f:
-                        image = Image.open(f)
-                    
-                    # Charger, redimensionner et normaliser l'image
-                    img = kimage.load_img(image_path, target_size=(224, 224))
-                    img = kimage.img_to_array(img)
-                    img = np.expand_dims(img, axis=0)
-                    img = img / 255.0
+    # Titre pour les prédictions
+    st.write('### Résultats des prédictions sur les données de test')
 
-                    ## Utiliser le modèle YOLOV9
-                    # detect_yolov9 = '.\yolov9_model\detect.py'
-                    # yolo_command = f"python detect.py --img 640 --device cpu --weights {model_path_yolov9} --source {image_path} --nosave --save-txt"
-                    # yolo_output = subprocess.check_output(yolo_command, shell=True, text=True)
-                    
-                    # Faire des prédictions avec le modèle VGG16
-                    prediction = model_vgg16.predict(img)
-                    
-                    # Obtenir la classe prédite et la probabilité du modèle VGG16
-                    max_index = np.argmax(prediction)
-                    max_label = classes_labels[max_index]
-                    max_proba = prediction[0][max_index]
-                    
-                    # Afficher la prédiction et la probabilité du modèle VGG16
-                    col1, col2 = st.columns(2)
-                    with col1:
+   # Bouton pour déclencher les prédictions
+    if st.sidebar.button('Prédire'):
+        exp = 1
+        # Créer un conteneur vide pour afficher le contenu en fonction de l'état du spinner
+        container = st.empty()
+        with st.spinner('Chargement...'):
+            for breed in dog_breeds:
+                st.write(f"##### Race de chien : {breed}")
+                breed_dir = os.path.join(data_test_dir, breed)
+                if os.path.isdir(breed_dir):
+                    breed_images = os.listdir(breed_dir)
+                    random.shuffle(breed_images)
+                    images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
+                    for image_name in images_selected:
+                        image_path = os.path.join(breed_dir, image_name)
+                        image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', f'exp{exp+1}', image_name)
+                        
+                        # Charger l'image
                         with open(image_path, 'rb') as f:
                             image = Image.open(f)
-                            st.image(image, width=150)
-                            st.write("Prédiction YOLOv9:")
-                            st.write("AR")  # Afficher la prédiction de YOLOv9
-                    with col2:
-                        st.write(f"Race prédite par le modèle VGG16 **{max_label}** avec une probabilité de : **{max_proba:.2f}**")
+                        
+                        # Redimensionner et normaliser l'image
+                        img = kimage.load_img(image_path, target_size=(224, 224))
+                        img = kimage.img_to_array(img)
+                        img = np.expand_dims(img, axis=0)
+                        img = img / 255.0
+
+                        # Utiliser le modèle YOLOV9
+                        detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
+                        yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+                        yolo_output = subprocess.check_output(yolo_command)
+                        
+                        # Faire des prédictions avec le modèle VGG16
+                        prediction = model_vgg16.predict(img)
+                        
+                        # Obtenir la classe prédite et la probabilité du modèle VGG16
+                        max_index = np.argmax(prediction)
+                        max_label = classes_labels[max_index]
+                        max_proba = prediction[0][max_index]*100
+                        
+                        # Afficher les prédictions
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**Prédiction VGG16**")
+                            with open(image_path, 'rb') as f:
+                                image = Image.open(f)
+                                st.image(image, width=150)
+                                st.write(f"**{max_label}** à **{max_proba:.2f}%**")
+                        with col2:
+                            st.write("**Prédiction YOLOV9**")
+                            with open(image_yolo_path, 'rb') as f:
+                                image2 = Image.open(f)
+                                st.image(image2, width=150)
+                        exp = exp + 1
+            # Chemin du dossier contenant les dossiers exp
+            exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
+
+            # Liste de tous les dossiers exp présents dans le répertoire
+            exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
+            for exp_dir in exp_folders:
+                if exp_dir != 'exp':
+                    exp_dir_path = os.path.join(exp_folder, exp_dir)
+                    shutil.rmtree(exp_dir_path)
+    else:
+        st.markdown("_Veuillez choisir les paramètres de prédiction et cliquer sur 'prédire' pour lancer la prédiction._")
 
 elif page == pages[4]:
     st.title("Prédiction du modèle")
+
+    st.write("Vous pouvez choisir une image dans la banque d'images mis à disposition ou bien uploder directement une image pour tester le modèle YOLOV9.")
+
+    images_dir = os.path.join('Images_test')
+
+    image_files = os.listdir(images_dir)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Choix d'une image dans la banque d'image :")
+        selected_image = st.selectbox("Sélectionner une image :", image_files, index=0)
+        image_path = os.path.join(images_dir, selected_image)
+        image = Image.open(image_path)
+        image_placeholder = st.empty()
+        image_placeholder.image(image, caption=selected_image, use_column_width=True)
+        
+        if st.button("Prédire avec YOLOV9"):
+            # Redimensionner et normaliser l'image
+            img = kimage.load_img(image_path, target_size=(224, 224))
+            img = kimage.img_to_array(img)
+            img = np.expand_dims(img, axis=0)
+            img = img / 255.0
+
+            # Utiliser le modèle YOLOV9
+            detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
+            yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+            yolo_output = subprocess.check_output(yolo_command)
+
+            # Afficher l'image avec la boîte de prédiction
+            image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp3', selected_image)
+            with open(image_yolo_path, 'rb') as f:
+                image2 = Image.open(f)
+                image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
+
+            # Chemin du dossier contenant les dossiers exp
+            exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
+            
+            # Supprimer le dossier exp2
+            exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
+            for exp_dir in exp_folders:
+                if exp_dir != 'exp':
+                    exp_dir_path = os.path.join(exp_folder, exp_dir)
+                    shutil.rmtree(exp_dir_path)
+    with col2:
+        st.subheader("Veuillez charger votre image ci-dessous :")
+        upload = st.file_uploader("Charger l'image du chien :", type=['png', 'jpeg', 'jpg'])
+        if upload:
+            # Enregistrer l'image téléchargée dans le dossier spécifié
+            save_folder = os.path.join('yolov9_model', 'runs', 'detect', 'exp2')
+            save_path = os.path.join(save_folder, upload.name)
+            with open(save_path, 'wb') as f:
+                f.write(upload.read())
+            
+            # Afficher l'image
+            image = Image.open(upload)
+            image_placeholder = st.empty()
+            image_placeholder.image(image, caption="Image uploadée", use_column_width=True)
+
+            # Redimensionner et normaliser l'image
+            img = kimage.load_img(image, target_size=(224, 224))
+            img = kimage.img_to_array(img)
+            img = np.expand_dims(img, axis=0)
+            img = img / 255.0
+
+            # Utiliser le modèle YOLOV9
+            detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
+            yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {upload}"
+            yolo_output = subprocess.check_output(yolo_command)
+
+            # Afficher l'image avec la boîte de prédiction
+            image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp3', selected_image)
+            with open(image_yolo_path, 'rb') as f:
+                image2 = Image.open(f)
+                image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
+
+            # Chemin du dossier contenant les dossiers exp
+            exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
+            
+            # Supprimer le dossier exp2
+            exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
+            for exp_dir in exp_folders:
+                if exp_dir != 'exp':
+                    exp_dir_path = os.path.join(exp_folder, exp_dir)
+                    shutil.rmtree(exp_dir_path)
