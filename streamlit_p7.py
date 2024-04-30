@@ -52,7 +52,7 @@ def load_and_resize_image(image_path, target_size):
     return img_array
 
 # Dossier contenant les images de test par race de chiens
-data_test_dir = os.path.join('Data_test')
+data_test_dir = os.path.join('./Data_test')
 
 # Classes sélectionnées
 selection_classes = ['Bernese_mountain_dog', 'boxer', 'briard',
@@ -307,7 +307,7 @@ elif page == pages[3]:
                     images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
                     for image_name in images_selected:
                         image_path = os.path.join(breed_dir, image_name)
-                        image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', f'exp{exp+1}', image_name)
+                        image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', f'exp{exp+1}', image_name)
                         
                         # Charger l'image
                         with open(image_path, 'rb') as f:
@@ -320,8 +320,8 @@ elif page == pages[3]:
                         img = img / 255.0
 
                         # Utiliser le modèle YOLOV9
-                        detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-                        yolo_command = f"python3 {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+                        detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                        yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
                         yolo_output = subprocess.check_output(yolo_command)
                         
                         # Faire des prédictions avec le modèle VGG16
@@ -347,7 +347,7 @@ elif page == pages[3]:
                                 st.image(image2, width=150)
                         exp = exp + 1
             # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
+            exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
 
             # Liste de tous les dossiers exp présents dans le répertoire
             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
@@ -363,7 +363,7 @@ elif page == pages[4]:
 
     st.write("Vous pouvez choisir une image dans la banque d'images mis à disposition ou bien uploder directement une image pour tester le modèle YOLOV9.")
 
-    images_dir = os.path.join('Images_test')
+    images_dir = os.path.join('./Images_test')
 
     image_files = os.listdir(images_dir)
 
@@ -385,18 +385,18 @@ elif page == pages[4]:
                 img = img / 255.0
 
                 # Utiliser le modèle YOLOV9
-                detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-                yolo_command = f"python3 {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
+                detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
                 yolo_output = subprocess.check_output(yolo_command)
 
                 # Afficher l'image avec la boîte de prédiction
-                image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp2', selected_image)
+                image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2', selected_image)
                 with open(image_yolo_path, 'rb') as f:
                     image2 = Image.open(f)
                     image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
+            exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
             
             # Supprimer le dossier exp2
             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
@@ -409,7 +409,7 @@ elif page == pages[4]:
         upload = st.file_uploader("Charger l'image du chien :", type=['png', 'jpeg', 'jpg'])
         if upload:
             # Enregistrer l'image téléchargée dans un dossier créé à cet effet
-            save_folder = os.path.join('yolov9_model', 'runs', 'detect', 'exp2')
+            save_folder = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2')
             os.makedirs(save_folder, exist_ok=True)
             save_path = os.path.join(save_folder, upload.name)
             with open(save_path, 'wb') as f:
@@ -423,19 +423,19 @@ elif page == pages[4]:
                 img = img / 255.0
 
                 # Utiliser le modèle YOLOV9
-                detect_yolov9 = os.path.join('yolov9_model', 'detect.py')
-                yolo_command = f"python3 {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {save_path}"
+                detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {save_path}"
                 yolo_output = subprocess.check_output(yolo_command)
 
                 # Afficher l'image avec la boîte de prédiction
-                image_yolo_path = os.path.join('yolov9_model', 'runs', 'detect', 'exp3', upload.name)
+                image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp3', upload.name)
                 with open(image_yolo_path, 'rb') as f:
                     image2 = Image.open(f)
                     image_placeholder = st.empty()
                     image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('yolov9_model', 'runs', 'detect')
+            exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
             
             # Supprimer le dossier exp2
             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
