@@ -37,9 +37,10 @@ page = st.sidebar.radio("Aller à la page :", pages)
 model_path_vgg16 = 'model_vgg16.h5'
 model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
 
-model_dir = './yolov9_model'
+# model_dir = './yolov9_model'
 model_filename = 'best.pt'
-model_path_yolov9 = os.path.join(model_dir, model_filename)
+# model_path_yolov9 = os.path.join(model_dir, model_filename)
+model_path_yolov9 = os.path.join(model_filename)
 
 # Chargement des labels
 with open('index_to_class.pkl', 'rb') as file:
@@ -307,7 +308,8 @@ elif page == pages[3]:
                     images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
                     for image_name in images_selected:
                         image_path = os.path.join(breed_dir, image_name)
-                        image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', f'exp{exp+1}', image_name)
+                        # image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', f'exp{exp+1}', image_name)
+                        image_yolo_path = os.path.join('./runs', 'detect', f'exp{exp+1}', image_name)
                         
                         # Charger l'image
                         with open(image_path, 'rb') as f:
@@ -320,7 +322,8 @@ elif page == pages[3]:
                         img = img / 255.0
 
                         # Utiliser le modèle YOLOV9
-                        detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                        # detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                        detect_yolov9 = './detect.py'
                         yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
                         yolo_output = subprocess.check_output(yolo_command)
                         
@@ -347,7 +350,8 @@ elif page == pages[3]:
                                 st.image(image2, width=150)
                         exp = exp + 1
             # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
+            # exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
+            exp_folder = os.path.join('./runs', 'detect')
 
             # Liste de tous les dossiers exp présents dans le répertoire
             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
@@ -385,18 +389,21 @@ elif page == pages[4]:
                 img = img / 255.0
 
                 # Utiliser le modèle YOLOV9
-                detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                # detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                detect_yolov9 = './detect.py'
                 yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {image_path}"
                 yolo_output = subprocess.check_output(yolo_command)
 
                 # Afficher l'image avec la boîte de prédiction
-                image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2', selected_image)
+                # image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2', selected_image)
+                image_yolo_path = os.path.join('./runs', 'detect', 'exp2', selected_image)
                 with open(image_yolo_path, 'rb') as f:
                     image2 = Image.open(f)
                     image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
+            # exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
+            exp_folder = os.path.join('./runs', 'detect')
             
             # Supprimer le dossier exp2
             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
@@ -409,7 +416,8 @@ elif page == pages[4]:
         upload = st.file_uploader("Charger l'image du chien :", type=['png', 'jpeg', 'jpg'])
         if upload:
             # Enregistrer l'image téléchargée dans un dossier créé à cet effet
-            save_folder = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2')
+            # save_folder = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2')
+            save_folder = os.path.join('./runs', 'detect', 'exp2')
             os.makedirs(save_folder, exist_ok=True)
             save_path = os.path.join(save_folder, upload.name)
             with open(save_path, 'wb') as f:
@@ -423,19 +431,22 @@ elif page == pages[4]:
                 img = img / 255.0
 
                 # Utiliser le modèle YOLOV9
-                detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                # detect_yolov9 = os.path.join('./yolov9_model', 'detect.py')
+                detect_yolov9 = './detect.py'
                 yolo_command = f"python {detect_yolov9} --img 640 --device cpu --weights {model_path_yolov9} --source {save_path}"
                 yolo_output = subprocess.check_output(yolo_command)
 
                 # Afficher l'image avec la boîte de prédiction
-                image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp3', upload.name)
+                # image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp3', upload.name)
+                image_yolo_path = os.path.join('./runs', 'detect', 'exp3', upload.name)
                 with open(image_yolo_path, 'rb') as f:
                     image2 = Image.open(f)
                     image_placeholder = st.empty()
                     image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
+            # exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
+            exp_folder = os.path.join('./runs', 'detect')
             
             # Supprimer le dossier exp2
             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
