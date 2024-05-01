@@ -11,7 +11,6 @@ from keras.preprocessing.image import load_img, img_to_array
 from keras.preprocessing import image as kimage
 import pickle
 import numpy as np
-import subprocess
 import shutil
 
 # Fonction copiée du fichier detect.py (car impossible de lancer une ligne de commande sur streamlit en ligne)
@@ -85,14 +84,7 @@ def run(
 
     # Dataloader
     bs = 1  # batch_size
-    if webcam:
-        view_img = check_imshow(warn=True)
-        dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
-        bs = len(dataset)
-    elif screenshot:
-        dataset = LoadScreenshots(source, img_size=imgsz, stride=stride, auto=pt)
-    else:
-        dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+    dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
     vid_path, vid_writer = [None] * bs, [None] * bs
 
     # Run inference
@@ -115,17 +107,10 @@ def run(
         with dt[2]:
             pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
 
-        # Second-stage classifier (optional)
-        # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
-
         # Process predictions
         for i, det in enumerate(pred):  # per image
             seen += 1
-            if webcam:  # batch_size >= 1
-                p, im0, frame = path[i], im0s[i].copy(), dataset.count
-                s += f'{i}: '
-            else:
-                p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
+            p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
 
             p = Path(p)  # to Path
             save_path = str(save_dir / p.name)  # im.jpg
