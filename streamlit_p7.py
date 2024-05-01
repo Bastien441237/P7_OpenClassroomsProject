@@ -207,9 +207,7 @@ page = st.sidebar.radio("Aller à la page :", pages)
 model_path_vgg16 = 'model_vgg16.h5'
 model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
 
-# model_dir = './yolov9_model'
-model_filename = 'best.pt'
-# model_path_yolov9 = os.path.join(model_dir, model_filename)
+model_filename = './best.pt'
 model_path_yolov9 = os.path.join(model_filename)
 
 # Chargement des labels
@@ -285,6 +283,7 @@ elif page == pages[2]:
              Dans ces 15 races de chiens, nous allons choisir volontairement des races similaires \
              où de nombreux modèles rencontrent habituellement des problèmes. Le but est de pouvoir avoir un \
              échantillon représentatif des scores que l'on pourrait obtenir sur l'ensemble du Stanford Dogs Dataset.")
+    
     # Liste des étiquettes sélectionnées
     selected_dirs = selection_classes
 
@@ -363,9 +362,11 @@ elif page == pages[2]:
 
     # Section sur l'explication de l'utilisation de RMBG 1.4 de BRIA AI dans le nettoyage du Dataset
     st.write("### Réduction du bruit via RMBG 1.4 de BRIA AI")
+
     # Affichage des images détourées
     st.write("Puis, pour enlever un maximum de bruit sur l'image, nous avons choisis d'utiliser le modèle de Bria AI (RMBG 1.4) \
             qui permet de détourer l'image. Ci-dessous, les images recadrées et détourées:")
+    
     # Chemin du dossier contenant les images détourées
     images_cutout_dir = "./dogs_cutout_15"
 
@@ -401,50 +402,70 @@ elif page == pages[3]:
              pré-entraîné sur les images brutes, c'est-à-dire non nettoyées. \
              Mais nous avons utilisé les couches d'input de VGG16 pour \
              le preprocessing de celles-ci.")
+    
     # Chemin d'accès de l'évaluation VGG16
     img1 = "./Images_streamlit/VGG16_evaluate.png"
+
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img1)
     st.write('#### Evaluation du modèle')
+
     # Afficher l'image dans Streamlit
     st.image(img, width=1000)
     st.write('#### Matrice de confusion sur les données de test')
+
     # Chemin d'accès de la matrice de confusion VGG16
     img2 = "./Images_streamlit/VGG16_confusion_matrix.png"
+
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img2)
+
     # Afficher l'image dans Streamlit
     st.image(img, width=800)
+
     # Modèle YOLOV9 sur les images non détourées
     st.write('### Modèle YOLOV9 sur les images non détourées')
     st.write('#### Evaluation du modèle')
+
     # Chemin d'accès de l'évaluation YOLOV9
     img3 = "./Images_streamlit/YOLOV9_results_1.png"
+
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img3)
+
     # Afficher l'image dans Streamlit
     st.image(img, width=900)
     st.write('#### Matrice de confusion sur les données de test')
+
     # Chemin d'accès de la matrice de confusion YOLOV9
     img4 = "./Images_streamlit/YOLOV9_confusion_matrix_1.png"
+
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img4)
+
     # Afficher l'image dans Streamlit
     st.image(img, width=1000)
+
     # Modèle YOLOV9 sur les images détourées
     st.write('### Modèle YOLOV9 sur les images détourées')
     st.write('#### Evaluation du modèle')
+
     # Chemin d'accès de l'évaluation YOLOV9
     img5 = "./Images_streamlit/YOLOV9_results_2.png"
+
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img5)
+
     # Afficher l'image dans Streamlit
     st.image(img, width=900)
     st.write('#### Matrice de confusion sur les données de test')
+
     # Chemin d'accès de la matrice de confusion YOLOV9
     img6 = "./Images_streamlit/YOLOV9_confusion_matrix_2.png"
+
     # Charger l'image à partir du chemin d'accès
     img = Image.open(img6)
+
     # Afficher l'image dans Streamlit
     st.image(img, width=1000)
     st.write('### Conclusion')
@@ -468,7 +489,7 @@ elif page == pages[3]:
         exp = 1
         # Créer un conteneur vide pour afficher le contenu en fonction de l'état du spinner
         container = st.empty()
-        with st.spinner('Chargement...'):
+        with st.spinner('Prédictions en cours...'):
             for breed in dog_breeds:
                 st.write(f"##### Race de chien : {breed}")
                 breed_dir = os.path.join(data_test_dir, breed)
@@ -478,7 +499,6 @@ elif page == pages[3]:
                     images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
                     for image_name in images_selected:
                         image_path = os.path.join(breed_dir, image_name)
-                        # image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', f'exp{exp+1}', image_name)
                         image_yolo_path = os.path.join('./runs', 'detect', f'exp{exp+1}', image_name)
                         
                         # Charger l'image
@@ -516,8 +536,8 @@ elif page == pages[3]:
                                 image2 = Image.open(f)
                                 st.image(image2, width=150)
                         exp = exp + 1
+
             # Chemin du dossier contenant les dossiers exp
-            # exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
             exp_folder = os.path.join('./runs', 'detect')
 
             # Liste de tous les dossiers exp présents dans le répertoire
@@ -559,14 +579,12 @@ elif page == pages[4]:
                 run(weights=model_path_yolov9, source=image_path, device='cpu')
 
                 # Afficher l'image avec la boîte de prédiction
-                # image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2', selected_image)
                 image_yolo_path = os.path.join('./runs', 'detect', 'exp2', selected_image)
                 with open(image_yolo_path, 'rb') as f:
                     image2 = Image.open(f)
                     image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
-            # exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
             exp_folder = os.path.join('./runs', 'detect')
             
             # Supprimer le dossier exp2
@@ -580,7 +598,6 @@ elif page == pages[4]:
         upload = st.file_uploader("Charger l'image du chien :", type=['png', 'jpeg', 'jpg'])
         if upload:
             # Enregistrer l'image téléchargée dans un dossier créé à cet effet
-            # save_folder = os.path.join('./yolov9_model', 'runs', 'detect', 'exp2')
             save_folder = os.path.join('./runs', 'detect', 'exp2')
             os.makedirs(save_folder, exist_ok=True)
             save_path = os.path.join(save_folder, upload.name)
@@ -598,7 +615,6 @@ elif page == pages[4]:
                 run(weights=model_path_yolov9, source=save_path, device='cpu')
 
                 # Afficher l'image avec la boîte de prédiction
-                # image_yolo_path = os.path.join('./yolov9_model', 'runs', 'detect', 'exp3', upload.name)
                 image_yolo_path = os.path.join('./runs', 'detect', 'exp3', upload.name)
                 with open(image_yolo_path, 'rb') as f:
                     image2 = Image.open(f)
@@ -606,7 +622,6 @@ elif page == pages[4]:
                     image_placeholder.image(image2, caption="Prédiction YOLOV9", use_column_width=True)
 
             # Chemin du dossier contenant les dossiers exp
-            # exp_folder = os.path.join('./yolov9_model', 'runs', 'detect')
             exp_folder = os.path.join('./runs', 'detect')
             
             # Supprimer le dossier exp2
