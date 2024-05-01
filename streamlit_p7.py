@@ -518,83 +518,165 @@ elif page == pages[3]:
     st.write('### Conclusion')
     st.write("Le modèle YOLOV9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
              Il est également intéressant de noter que ce modèle obtient de meilleurs résultats sur les données de test.")
+    
+# Code tros gourmand pour Streamlit Cloud
+#     # Liste des races de chiens disponibles
+#     dog_breeds = os.listdir(data_test_dir)
 
+#     # Titre pour les paramètres de prédiction test
+#     st.sidebar.title("Choix des paramètres de prédiction test :")
+
+#     # Sidebar pour choisir le nombre d'images par race de chiens
+#     num_images_per_breed = st.sidebar.selectbox("Nombre d'images par race de chiens :", [1, 2, 3, 4, 5])
+
+#     # Titre pour les prédictions
+#     st.write('### Résultats des prédictions sur les données de test')
+
+#    # Bouton pour déclencher les prédictions
+#     if st.sidebar.button('Prédire'):
+#         exp = 1
+#         # Créer un conteneur vide pour afficher le contenu en fonction de l'état du spinner
+#         container = st.empty()
+#         with st.spinner('Prédictions en cours...'):
+#             for breed in dog_breeds:
+#                 st.write(f"##### Race de chien : {breed}")
+#                 breed_dir = os.path.join(data_test_dir, breed)
+#                 if os.path.isdir(breed_dir):
+#                     breed_images = os.listdir(breed_dir)
+#                     random.shuffle(breed_images)
+#                     images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
+#                     for image_name in images_selected:
+#                         image_path = os.path.join(breed_dir, image_name)
+#                         image_yolo_path = os.path.join('./runs', 'detect', f'exp{exp+1}', image_name)
+                        
+#                         # Charger l'image
+#                         with open(image_path, 'rb') as f:
+#                             image = Image.open(f)
+                        
+#                         # Redimensionner et normaliser l'image
+#                         img = kimage.load_img(image_path, target_size=(224, 224))
+#                         img = kimage.img_to_array(img)
+#                         img = np.expand_dims(img, axis=0)
+#                         img = img / 255.0
+
+#                         # Utiliser le modèle YOLOV9 avec la fonction run
+#                         run(weights=model_path_yolov9, source=image_path, device='cpu')
+
+#                         # Faire des prédictions avec le modèle VGG16
+#                         prediction = model_vgg16.predict(img)
+                        
+#                         # Obtenir la classe prédite et la probabilité du modèle VGG16
+#                         max_index = np.argmax(prediction)
+#                         max_label = classes_labels[max_index]
+#                         max_proba = prediction[0][max_index]*100
+                        
+#                         # Afficher les prédictions
+#                         col1, col2 = st.columns(2)
+#                         with col1:
+#                             st.write("**Prédiction VGG16**")
+#                             with open(image_path, 'rb') as f:
+#                                 image = Image.open(f)
+#                                 st.image(image, width=150)
+#                                 st.write(f"**{max_label}** à **{max_proba:.2f}%**")
+#                         with col2:
+#                             st.write("**Prédiction YOLOV9**")
+#                             with open(image_yolo_path, 'rb') as f:
+#                                 image2 = Image.open(f)
+#                                 st.image(image2, width=150)
+#                         exp = exp + 1
+
+#             # Chemin du dossier contenant les dossiers exp
+#             exp_folder = os.path.join('./runs', 'detect')
+
+#             # Liste de tous les dossiers exp présents dans le répertoire
+#             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
+#             for exp_dir in exp_folders:
+#                 if exp_dir != 'exp':
+#                     exp_dir_path = os.path.join(exp_folder, exp_dir)
+#                     shutil.rmtree(exp_dir_path)
+#     else:
+#         st.markdown("_Veuillez choisir les paramètres de prédiction et cliquer sur 'prédire' pour lancer la prédiction._")
+    
     # Liste des races de chiens disponibles
     dog_breeds = os.listdir(data_test_dir)
 
     # Titre pour les paramètres de prédiction test
     st.sidebar.title("Choix des paramètres de prédiction test :")
 
-    # Sidebar pour choisir le nombre d'images par race de chiens
-    num_images_per_breed = st.sidebar.selectbox("Nombre d'images par race de chiens :", [1, 2, 3, 4, 5])
+    # Sidebar pour choisir la race de chien
+    selected_breed = st.sidebar.selectbox("Choisir une race de chien :", dog_breeds)
+
+    # Sidebar pour choisir le nombre d'images par race de chiens (1 à 2)
+    num_images_per_breed = st.sidebar.slider("Nombre d'images par race de chiens :", 1, 2, 1)
 
     # Titre pour les prédictions
     st.write('### Résultats des prédictions sur les données de test')
 
-   # Bouton pour déclencher les prédictions
+    # Bouton pour déclencher les prédictions
     if st.sidebar.button('Prédire'):
         exp = 1
         # Créer un conteneur vide pour afficher le contenu en fonction de l'état du spinner
         container = st.empty()
         with st.spinner('Prédictions en cours...'):
-            for breed in dog_breeds:
-                st.write(f"##### Race de chien : {breed}")
-                breed_dir = os.path.join(data_test_dir, breed)
-                if os.path.isdir(breed_dir):
-                    breed_images = os.listdir(breed_dir)
-                    random.shuffle(breed_images)
-                    images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
-                    for image_name in images_selected:
-                        image_path = os.path.join(breed_dir, image_name)
-                        image_yolo_path = os.path.join('./runs', 'detect', f'exp{exp+1}', image_name)
-                        
-                        # Charger l'image
+            st.write(f"##### Race de chien : {selected_breed}")
+            breed_dir = os.path.join(data_test_dir, selected_breed)
+            if os.path.isdir(breed_dir):
+                breed_images = os.listdir(breed_dir)
+                random.shuffle(breed_images)
+                images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
+                for image_name in images_selected:
+                    image_path = os.path.join(breed_dir, image_name)
+                    image_yolo_path = os.path.join('./runs', 'detect', f'exp{exp+1}', image_name)
+                    
+                    # Charger l'image
+                    with open(image_path, 'rb') as f:
+                        image = Image.open(f)
+                    
+                    # Redimensionner et normaliser l'image
+                    img = kimage.load_img(image_path, target_size=(224, 224))
+                    img = kimage.img_to_array(img)
+                    img = np.expand_dims(img, axis=0)
+                    img = img / 255.0
+
+                    # Utiliser le modèle YOLOV9 avec la fonction run
+                    run(weights=model_path_yolov9, source=image_path, device='cpu')
+
+                    # Faire des prédictions avec le modèle VGG16
+                    prediction = model_vgg16.predict(img)
+                    
+                    # Obtenir la classe prédite et la probabilité du modèle VGG16
+                    max_index = np.argmax(prediction)
+                    max_label = classes_labels[max_index]
+                    max_proba = prediction[0][max_index]*100
+                    
+                    # Afficher les prédictions
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write("**Prédiction VGG16**")
                         with open(image_path, 'rb') as f:
                             image = Image.open(f)
-                        
-                        # Redimensionner et normaliser l'image
-                        img = kimage.load_img(image_path, target_size=(224, 224))
-                        img = kimage.img_to_array(img)
-                        img = np.expand_dims(img, axis=0)
-                        img = img / 255.0
+                            st.image(image, width=150)
+                            st.write(f"**{max_label}** à **{max_proba:.2f}%**")
+                    with col2:
+                        st.write("**Prédiction YOLOV9**")
+                        with open(image_yolo_path, 'rb') as f:
+                            image2 = Image.open(f)
+                            st.image(image2, width=150)
+                    exp = exp + 1
 
-                        # Utiliser le modèle YOLOV9 avec la fonction run
-                        run(weights=model_path_yolov9, source=image_path, device='cpu')
+        # Chemin du dossier contenant les dossiers exp
+        exp_folder = os.path.join('./runs', 'detect')
 
-                        # Faire des prédictions avec le modèle VGG16
-                        prediction = model_vgg16.predict(img)
-                        
-                        # Obtenir la classe prédite et la probabilité du modèle VGG16
-                        max_index = np.argmax(prediction)
-                        max_label = classes_labels[max_index]
-                        max_proba = prediction[0][max_index]*100
-                        
-                        # Afficher les prédictions
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.write("**Prédiction VGG16**")
-                            with open(image_path, 'rb') as f:
-                                image = Image.open(f)
-                                st.image(image, width=150)
-                                st.write(f"**{max_label}** à **{max_proba:.2f}%**")
-                        with col2:
-                            st.write("**Prédiction YOLOV9**")
-                            with open(image_yolo_path, 'rb') as f:
-                                image2 = Image.open(f)
-                                st.image(image2, width=150)
-                        exp = exp + 1
-
-            # Chemin du dossier contenant les dossiers exp
-            exp_folder = os.path.join('./runs', 'detect')
-
-            # Liste de tous les dossiers exp présents dans le répertoire
-            exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
-            for exp_dir in exp_folders:
-                if exp_dir != 'exp':
-                    exp_dir_path = os.path.join(exp_folder, exp_dir)
-                    shutil.rmtree(exp_dir_path)
+        # Liste de tous les dossiers exp présents dans le répertoire
+        exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
+        for exp_dir in exp_folders:
+            if exp_dir != 'exp':
+                exp_dir_path = os.path.join(exp_folder, exp_dir)
+                shutil.rmtree(exp_dir_path)
     else:
-        st.markdown("_Veuillez choisir les paramètres de prédiction et cliquer sur 'prédire' pour lancer la prédiction._")
+        st.markdown("_Veuillez choisir une race de chien et le nombre d'images par race, puis cliquer sur 'Prédire' pour lancer la prédiction._")
+
+
 
 elif page == pages[4]:
     st.title("Prédiction du modèle")
