@@ -207,8 +207,62 @@ page = st.sidebar.radio("Aller à la page :", pages)
 model_path_vgg16 = 'model_vgg16.h5'
 model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
 
+# model_filename = './best.pt'
+# model_path_yolov9 = os.path.join(model_filename)
+
+import requests
+
+def download_file_from_google_drive(id, destination):
+    def get_confirm_token(response):
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                return value
+
+        return None
+
+    def save_response_content(response, destination):
+        CHUNK_SIZE = 32768
+
+        with open(destination, "wb") as f:
+            for chunk in response.iter_content(CHUNK_SIZE):
+                if chunk: # filter out keep-alive new chunks
+                    f.write(chunk)
+
+    URL = "https://docs.google.com/uc?export=download"
+
+    session = requests.Session()
+
+    response = session.get(URL, params = { 'id' : id }, stream = True)
+    token = get_confirm_token(response)
+
+    if token:
+        params = { 'id' : id, 'confirm' : token }
+        response = session.get(URL, params = params, stream = True)
+
+    save_response_content(response, destination)    
+
+# Identifiant de votre fichier modèle sur Google Drive
+model_file_id = "11fV815aVkGKY4jr0xik9AMl1zGHaEN3A"
+
+# Chemin de destination où vous souhaitez enregistrer votre modèle
+destination_model_path = "./best.pt"
+
+# Téléchargement du modèle depuis Google Drive
+download_file_from_google_drive(model_file_id, destination_model_path)
+
 model_filename = './best.pt'
 model_path_yolov9 = os.path.join(model_filename)
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) is not 3:
+        print("Usage: python google_drive.py drive_file_id destination_file_path")
+    else:
+        # TAKE ID FROM SHAREABLE LINK
+        file_id = sys.argv[1]
+        # DESTINATION FILE ON YOUR DISK
+        destination = sys.argv[2]
+        download_file_from_google_drive(file_id, destination)
 
 # Chargement des labels
 with open('index_to_class.pkl', 'rb') as file:
