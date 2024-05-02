@@ -32,7 +32,6 @@ from utils.general import (LOGGER, Profile, check_file, check_img_size, check_im
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
-
 @smart_inference_mode()
 def run(
         weights=ROOT / 'yolo.pt',  # model path or triton URL
@@ -184,6 +183,19 @@ def run(
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
 
+######################################################################
+# Téléchargement du modèle
+import gdown
+
+# Lien direct vers le fichier sur Google Drive
+url = 'https://drive.google.com/uc?id=11fV815aVkGKY4jr0xik9AMl1zGHaEN3A'
+
+# Emplacement où enregistrer le fichier téléchargé
+destination = 'modelbest.pt'
+
+# Téléchargement du fichier
+gdown.download(url, destination, quiet=False)
+########################################################################
 # Chemin vers le répertoire d'images
 images_dir = os.path.join('Images')
 
@@ -196,7 +208,7 @@ for root, dirs, images in os.walk(images_dir):
         image_files.append(os.path.join(root, image))
         labels.append(os.path.basename(root).split('-')[1])
 
-# Mise en place des DataFrames
+# Mise en place du DataFrames
 df_dogs = pd.DataFrame({'image_path': image_files, 'label': labels})
 
 st.sidebar.title("Sommaire")
@@ -206,54 +218,6 @@ page = st.sidebar.radio("Aller à la page :", pages)
 # Chargement des modèles
 model_path_vgg16 = 'model_vgg16.h5'
 model_vgg16 = tf.keras.models.load_model(model_path_vgg16)
-
-######################################################################
-# import requests
-
-# def download_file_from_google_drive(id, destination):
-#     def get_confirm_token(response):
-#         for key, value in response.cookies.items():
-#             if key.startswith('download_warning'):
-#                 return value
-
-#         return None
-
-#     def save_response_content(response, destination):
-#         CHUNK_SIZE = 32768
-
-#         with open(destination, "wb") as f:
-#             for chunk in response.iter_content(CHUNK_SIZE):
-#                 if chunk: # filter out keep-alive new chunks
-#                     f.write(chunk)
-
-#     URL = f"https://drive.google.com/uc?export=download&id={file_id}"
-
-#     session = requests.Session()
-
-#     response = session.get(URL, params={'id': id}, stream=True)
-#     token = get_confirm_token(response)
-
-#     if token:
-#         params = {'id': id, 'confirm': token}
-#         response = session.get(URL, params=params, stream=True)
-
-#     save_response_content(response, destination)    
-
-# file_id = "11fV815aVkGKY4jr0xik9AMl1zGHaEN3A"
-# destination = "./modelbest.pt"
-# download_file_from_google_drive(file_id, destination)
-import gdown
-
-# Lien direct vers le fichier sur Google Drive
-url = 'https://drive.google.com/uc?id=11fV815aVkGKY4jr0xik9AMl1zGHaEN3A'
-
-# Emplacement où enregistrer le fichier téléchargé
-destination = 'modelbest.pt'
-
-# Téléchargement du fichier
-gdown.download(url, destination, quiet=False)
-########################################################################
-
 model_filename = './modelbest.pt'
 model_path_yolov9 = os.path.join(model_filename)
 
@@ -277,11 +241,56 @@ selection_classes = ['Bernese_mountain_dog', 'boxer', 'briard',
                     'Greater_Swiss_Mountain_dog', 'Irish_setter', 'Rottweiler',
                     'Samoyed', 'Tibetan_terrier', 'vizsla']
 
+# Initialiser un dictionnaire pour stocker le nombre d'images par étiquette
+label_counts = {}
+
+# Boucle pour récupérer les noms d'images et les labels
+for root, dirs, images in os.walk(images_dir):
+    for image in images:
+        label = os.path.basename(root).split('-')[1]
+        label_counts[label] = label_counts.get(label, 0) + 1
+df_label_counts = pd.DataFrame(label_counts.items(), columns=['Label', "Nombre d'images"])
+
+# Afficher un describe
+label_statistics = df_label_counts.describe()
+
+# Ajouter une colonne pour le total d'images
+label_statistics.loc['Total'] = df_label_counts["Nombre d'images"].sum()
+
+# Application Streamlit
+# Page d'explication du contexte du projet
 if page == pages[0]:
     st.title("Contexte du projet")
+    
+    st.write("### YOLOv9, modèle de détection d'objets, peut-il améliorer la classification d'images dans la vision par ordinateur ?")
+
+    # Chemin d'accès à l'image
+    img = "./Images_streamlit/YoloV9.png"
+    # Charger l'image à partir du chemin d'accès
+    img = Image.open(img)
+    # Afficher l'image dans Streamlit
+    st.image(img, width=700)
+
+    st.write("Dans le cadre de notre projet, nous avons entrepris d'explorer \
+             les capacités de YOLOv9, une version récente et améliorée du \
+             modèle YOLO (*You Only Look Once*), largement utilisé pour la détection \
+             d'objets dans les images et les vidéos. YOLOv9 s'inscrit dans la lignée \
+             de ses prédécesseurs, bénéficiant de plusieurs améliorations et optimisations\
+              qui en font un choix attrayant pour notre étude. Disponible depuis quelques\
+              mois seulement, ce modèle a déjà fait ses preuves en matière de détection\
+              d'objets, y compris la détection de chiens dans des images et des flux vidéo. \
+             Les retours et tests disponibles suggèrent que YOLOv9 offre une performance accrue, \
+             notamment dans la détection d'objets en mouvement, ce qui en fait un choix prometteur \
+             pour notre exploration dans le domaine spécifique de la classification des races de chiens.")
 
 elif page == pages[1]:
     st.title('Analyse exploratoire des données')
+
+    st.write("Afin de tester le modèle YOLOv9, nous avons choisis d'utiliser le Stanford Dogs Dataset\
+             qui contient 120 races différentes de chiens et 20 580 images.")
+    
+    st.write("### Affichage des statistiques")
+    st.dataframe(label_statistics)
 
     st.write("### Nombre d'images par labels")
     # Grouper et compter le nombre d'images par étiquette
@@ -326,10 +335,13 @@ elif page == pages[1]:
 elif page == pages[2]:
     # Titre de la page
     st.title('Nettoyage des données')
-    st.write("Nous allons d'abord choisir 15 races de chiens afin de réduire le temps de calcul. \
-             Dans ces 15 races de chiens, nous allons choisir volontairement des races similaires \
-             où de nombreux modèles rencontrent habituellement des problèmes. Le but est de pouvoir avoir un \
-             échantillon représentatif des scores que l'on pourrait obtenir sur l'ensemble du Stanford Dogs Dataset.")
+
+    st.write("Pour commencer, nous allons sélectionner uniquement 15 races de chiens, \
+             ce qui permettra de réduire significativement le temps de calcul nécessaire. \
+             Parmi ces 15 races, nous choisirons délibérément des races similaires où les \
+             modèles rencontrent souvent des difficultés. L'objectif est d'obtenir un \
+             échantillon représentatif des performances que nous pourrions atteindre sur \
+             l'ensemble du Stanford Dogs Dataset.")
     
     # Liste des étiquettes sélectionnées
     selected_dirs = selection_classes
@@ -362,8 +374,9 @@ elif page == pages[2]:
 
     # Section sur l'explication de l'utilisation de YOLOV9 dans le nettoyage du Dataset
     st.write("### Identification des chiens avec YOLOV9")
-    st.write("Nous avons ensuite utilisé YOLOV9 afin de pouvoir identifier si des chiens étaient présents sur les images.\
-              En effet, il est possible d'avoir des humains, d'autres animaux ou bien même des objets sur les photos.")
+    st.write("Nous avons ensuite utilisé YOLOv9 pour déterminer la présence de chiens dans les images. \
+             En effet, celles-ci peuvent contenir non seulement des chiens, mais aussi des humains, \
+             d'autres animaux ou même des objets.")
     # Chemin d'accès de l'image
     image_path = "n02088094_294.jpg"
     # Charger l'image à partir du chemin d'accès
@@ -372,9 +385,10 @@ elif page == pages[2]:
     st.image(img, width=300)
 
     # Affichage des images originales
-    st.write("Puis, nous avons utilisé ces détections pour ne garder que les détections de chiens dans les images. \
-                Le but est de recadrer les images sur ce qui va apporter le plus d'information à la classification par races de chiens. \
-                Ci-dessous, les photos une fois recadrées :")
+    st.write("Ensuite, nous avons utilisé ces détections pour conserver uniquement les régions \
+             contenant des chiens dans les images. L'objectif était de recadrer les images afin \
+             de focaliser l'attention sur les éléments les plus pertinents pour la classification \
+             des races de chiens. Ci-dessous, vous pouvez voir les images une fois recadrées :")
     # Chemin du dossier contenant les images détectées
     images_detect_dir = "./dogs_detection_15"
 
@@ -411,8 +425,9 @@ elif page == pages[2]:
     st.write("### Réduction du bruit via RMBG 1.4 de BRIA AI")
 
     # Affichage des images détourées
-    st.write("Puis, pour enlever un maximum de bruit sur l'image, nous avons choisis d'utiliser le modèle de Bria AI (RMBG 1.4) \
-            qui permet de détourer l'image. Ci-dessous, les images recadrées et détourées:")
+    st.write("Enfin, afin de réduire au maximum le bruit dans les images, nous avons opté pour \
+             l'utilisation du modèle de Bria AI (RMBG 1.4), qui offre la possibilité de détourer l'image. \
+             Vous pouvez voir ci-dessous les images recadrées et détourées :")
     
     # Chemin du dossier contenant les images détourées
     images_cutout_dir = "./dogs_cutout_15"
@@ -470,8 +485,17 @@ elif page == pages[3]:
     # Afficher l'image dans Streamlit
     st.image(img, width=800)
 
+    # Explication des résultats
+    st.write("Lors de son entraînement, VGG16 a tendance à présenter des signes de surapprentissage, \
+             même avec l'utilisation d'un EarlyStopping pour limiter le nombre d'epochs. Cependant, \
+             cette tendance est mieux comprise lorsque nous examinons les scores de la matrice de confusion. \
+             Comme prévu avec l'échantillonnage des 15 races de chiens, le modèle éprouve des difficultés \
+             à distinguer les races similaires.")
+    st.write("Cette baseline nous fournit un premier score à partir duquel nous allons pouvoir évaluer les \
+             performances de YOLOv9, ainsi que l'impact de notre processus de nettoyage préalable.")
+
     # Modèle YOLOV9 sur les images non détourées
-    st.write('### Modèle YOLOV9 sur les images non détourées')
+    st.write('### Modèle YOLOv9 sur les images non détourées')
     st.write('#### Evaluation du modèle')
 
     # Chemin d'accès de l'évaluation YOLOV9
@@ -492,6 +516,13 @@ elif page == pages[3]:
 
     # Afficher l'image dans Streamlit
     st.image(img, width=1000)
+
+    # Explication des résultats
+    st.write("Le modèle YOLOv9 a été entraîné sur 70 epochs en utilisant les images non détourées, \
+             aboutissant à une précision maximale de 0.6. Cette performance n'est pas nécessairement \
+             supérieure à celle du modèle VGG16. Cependant, une analyse plus approfondie de la matrice \
+             de confusion révèle que le modèle commence à discerner les races de chiens, bien qu'il \
+             éprouve encore des difficultés avec les races similaires.")
 
     # Modèle YOLOV9 sur les images détourées
     st.write('### Modèle YOLOV9 sur les images détourées')
@@ -515,87 +546,20 @@ elif page == pages[3]:
 
     # Afficher l'image dans Streamlit
     st.image(img, width=1000)
+
+        # Explication des résultats
+    st.write("Ensuite, nous avons entraîné le modèle YOLOv9 sur les images détourées, \
+             ce qui a donné des résultats améliorés sur le même nombre d'epochs (70). \
+             Cependant, il était évident que la précision pouvait être davantage améliorée \
+             en augmentant le nombre d'epochs, tout en surveillant le risque de surapprentissage.")
+    st.write(" Par conséquent, nous avons augmenté le nombre d'epochs à 100, ce qui nous a permis d'atteindre \
+              une précision d'environ 0.8. De plus, l'analyse de la matrice de confusion révèle une \
+             amélioration dans la reconnaissance des races de chiens similaires, \
+             ainsi qu'une amélioration globale des classifications.")
+
     st.write('### Conclusion')
-    st.write("Le modèle YOLOV9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
-             Il est également intéressant de noter que ce modèle obtient de meilleurs résultats sur les données de test.")
-    
-# Code tros gourmand pour Streamlit Cloud
-#     # Liste des races de chiens disponibles
-#     dog_breeds = os.listdir(data_test_dir)
-
-#     # Titre pour les paramètres de prédiction test
-#     st.sidebar.title("Choix des paramètres de prédiction test :")
-
-#     # Sidebar pour choisir le nombre d'images par race de chiens
-#     num_images_per_breed = st.sidebar.selectbox("Nombre d'images par race de chiens :", [1, 2, 3, 4, 5])
-
-#     # Titre pour les prédictions
-#     st.write('### Résultats des prédictions sur les données de test')
-
-#    # Bouton pour déclencher les prédictions
-#     if st.sidebar.button('Prédire'):
-#         exp = 1
-#         # Créer un conteneur vide pour afficher le contenu en fonction de l'état du spinner
-#         container = st.empty()
-#         with st.spinner('Prédictions en cours...'):
-#             for breed in dog_breeds:
-#                 st.write(f"##### Race de chien : {breed}")
-#                 breed_dir = os.path.join(data_test_dir, breed)
-#                 if os.path.isdir(breed_dir):
-#                     breed_images = os.listdir(breed_dir)
-#                     random.shuffle(breed_images)
-#                     images_selected = breed_images[:min(num_images_per_breed, len(breed_images))]
-#                     for image_name in images_selected:
-#                         image_path = os.path.join(breed_dir, image_name)
-#                         image_yolo_path = os.path.join('./runs', 'detect', f'exp{exp+1}', image_name)
-                        
-#                         # Charger l'image
-#                         with open(image_path, 'rb') as f:
-#                             image = Image.open(f)
-                        
-#                         # Redimensionner et normaliser l'image
-#                         img = kimage.load_img(image_path, target_size=(224, 224))
-#                         img = kimage.img_to_array(img)
-#                         img = np.expand_dims(img, axis=0)
-#                         img = img / 255.0
-
-#                         # Utiliser le modèle YOLOV9 avec la fonction run
-#                         run(weights=model_path_yolov9, source=image_path, device='cpu')
-
-#                         # Faire des prédictions avec le modèle VGG16
-#                         prediction = model_vgg16.predict(img)
-                        
-#                         # Obtenir la classe prédite et la probabilité du modèle VGG16
-#                         max_index = np.argmax(prediction)
-#                         max_label = classes_labels[max_index]
-#                         max_proba = prediction[0][max_index]*100
-                        
-#                         # Afficher les prédictions
-#                         col1, col2 = st.columns(2)
-#                         with col1:
-#                             st.write("**Prédiction VGG16**")
-#                             with open(image_path, 'rb') as f:
-#                                 image = Image.open(f)
-#                                 st.image(image, width=150)
-#                                 st.write(f"**{max_label}** à **{max_proba:.2f}%**")
-#                         with col2:
-#                             st.write("**Prédiction YOLOV9**")
-#                             with open(image_yolo_path, 'rb') as f:
-#                                 image2 = Image.open(f)
-#                                 st.image(image2, width=150)
-#                         exp = exp + 1
-
-#             # Chemin du dossier contenant les dossiers exp
-#             exp_folder = os.path.join('./runs', 'detect')
-
-#             # Liste de tous les dossiers exp présents dans le répertoire
-#             exp_folders = [folder for folder in os.listdir(exp_folder) if folder.startswith('exp')]
-#             for exp_dir in exp_folders:
-#                 if exp_dir != 'exp':
-#                     exp_dir_path = os.path.join(exp_folder, exp_dir)
-#                     shutil.rmtree(exp_dir_path)
-#     else:
-#         st.markdown("_Veuillez choisir les paramètres de prédiction et cliquer sur 'prédire' pour lancer la prédiction._")
+    st.write("Le modèle YOLOv9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
+             Nous allons donc choisir ce modèle.")
     
     # Liste des races de chiens disponibles
     dog_breeds = os.listdir(data_test_dir)
@@ -674,14 +638,14 @@ elif page == pages[3]:
                 exp_dir_path = os.path.join(exp_folder, exp_dir)
                 shutil.rmtree(exp_dir_path)
     else:
-        st.markdown("_Veuillez choisir une race de chien et le nombre d'images par race, puis cliquer sur 'Prédire' pour lancer la prédiction._")
-
-
+        st.markdown("_Veuillez sélectionner les paramètres sur la barre latérale gauche,\
+                     puis cliquer sur '**Prédire**' afin d'afficher les prédictions._")
 
 elif page == pages[4]:
     st.title("Prédiction du modèle")
 
-    st.write("Vous pouvez choisir une image dans la banque d'images mis à disposition ou bien uploder directement une image pour tester le modèle YOLOV9.")
+    st.write("Vous pouvez choisir une image dans la banque d'images mise à disposition \
+             ou bien uploader directement une image pour tester le modèle YOLOv9.")
 
     images_dir = os.path.join('./Images_test')
 
