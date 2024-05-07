@@ -13,7 +13,7 @@ import pickle
 import numpy as np
 import shutil
 
-# Lien vers le Dashboard en ligne : https://bastien441237-p7--moreno-bastien-4-code-dashboard-052024-qnwzwh.streamlit.app/
+# Lien vers le Dashboard en ligne : https://dashboard-yolov9.streamlit.app/
 
 # Fonction copiée du fichier detect.py (car impossible de lancer une ligne de commande sur streamlit en ligne)
 import platform
