@@ -13,6 +13,8 @@ import pickle
 import numpy as np
 import shutil
 
+# Lien vers le Dashboard en ligne : https://bastien441237-p7--moreno-bastien-4-code-dashboard-052024-qnwzwh.streamlit.app/
+
 # Fonction copiée du fichier detect.py (car impossible de lancer une ligne de commande sur streamlit en ligne)
 import platform
 import sys
@@ -211,6 +213,10 @@ for root, dirs, images in os.walk(images_dir):
 # Mise en place du DataFrames
 df_dogs = pd.DataFrame({'image_path': image_files, 'label': labels})
 
+# Création de la sidebar
+st.sidebar.title("Taille du texte :")
+text_size = st.sidebar.select_slider("(en %)", options=list(range(50, 301)), value=100)
+
 st.sidebar.title("Sommaire")
 pages = ['Contexte du projet', 'Analyse exploratoire des données', 'Nettoyage des données', 'Choix du modèle', 'Prédiction du modèle']
 page = st.sidebar.radio("Aller à la page :", pages)
@@ -260,8 +266,7 @@ label_statistics.loc['Total'] = df_label_counts["Nombre d'images"].sum()
 # Application Streamlit
 # Page d'explication du contexte du projet
 if page == pages[0]:
-    st.title("Contexte du projet")
-    
+    st.title('Contexte du projet')
     st.write("### YOLOv9, modèle de détection d'objets, peut-il améliorer la classification d'images dans la vision par ordinateur ?")
 
     # Chemin d'accès à l'image
@@ -271,26 +276,32 @@ if page == pages[0]:
     # Afficher l'image dans Streamlit
     st.image(img, width=700)
 
-    st.write("Dans le cadre de notre projet, nous avons entrepris d'explorer \
-             les capacités de YOLOv9, une version récente et améliorée du \
-             modèle YOLO (*You Only Look Once*), largement utilisé pour la détection \
-             d'objets dans les images et les vidéos. YOLOv9 s'inscrit dans la lignée \
-             de ses prédécesseurs, bénéficiant de plusieurs améliorations et optimisations\
-              qui en font un choix attrayant pour notre étude. Disponible depuis quelques\
-              mois seulement, ce modèle a déjà fait ses preuves en matière de détection\
-              d'objets, y compris la détection de chiens dans des images et des flux vidéo. \
-             Les retours et tests disponibles suggèrent que YOLOv9 offre une performance accrue, \
-             notamment dans la détection d'objets en mouvement, ce qui en fait un choix prometteur \
-             pour notre exploration dans le domaine spécifique de la classification des races de chiens.")
+    texte = "Dans le cadre de notre projet, nous avons entrepris d'explorer \
+            les capacités de YOLOv9, une version récente et améliorée du \
+            modèle YOLO (*You Only Look Once*), largement utilisé pour la détection \
+            d'objets dans les images et les vidéos. YOLOv9 s'inscrit dans la lignée \
+            de ses prédécesseurs, bénéficiant de plusieurs améliorations et optimisations\
+            qui en font un choix attrayant pour notre étude. Disponible depuis quelques\
+            mois seulement, ce modèle a déjà fait ses preuves en matière de détection\
+            d'objets, y compris la détection de chiens dans des images et des flux vidéo. \
+            Les retours et tests disponibles suggèrent que YOLOv9 offre une performance accrue, \
+            notamment dans la détection d'objets en mouvement, ce qui en fait un choix prometteur \
+            pour notre exploration dans le domaine spécifique de la classification des races de chiens."
+
+    # Affichage du texte avec la taille sélectionnée
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
 elif page == pages[1]:
     st.title('Analyse exploratoire des données')
 
-    st.write("Afin de tester le modèle YOLOv9, nous avons choisis d'utiliser le Stanford Dogs Dataset\
-             qui contient 120 races différentes de chiens et 20 580 images.")
+    texte = "Afin de tester le modèle YOLOv9, nous avons choisis d'utiliser le Stanford Dogs Dataset\
+             qui contient 120 races différentes de chiens et 20 580 images."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     
     st.write("### Affichage des statistiques")
     st.dataframe(label_statistics)
+    texte = "On a donc 120 classes différentes avec en moyenne 171 images par classes."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
     st.write("### Nombre d'images par labels")
     # Grouper et compter le nombre d'images par étiquette
@@ -330,18 +341,20 @@ elif page == pages[1]:
             plt.tight_layout()
             st.pyplot(plt)  # Afficher le graphique dans Streamlit
     else:
-        st.write("Aucune étiquette sélectionnée. Veuillez en sélectionner au moins une dans la barre latérale.")
+        texte = "Aucune étiquette sélectionnée. Veuillez en sélectionner au moins une dans la barre latérale."
+        st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
 elif page == pages[2]:
     # Titre de la page
     st.title('Nettoyage des données')
 
-    st.write("Pour commencer, nous allons sélectionner uniquement 15 races de chiens, \
+    texte = "Pour commencer, nous allons sélectionner uniquement 15 races de chiens, \
              ce qui permettra de réduire significativement le temps de calcul nécessaire. \
              Parmi ces 15 races, nous choisirons délibérément des races similaires où les \
              modèles rencontrent souvent des difficultés. L'objectif est d'obtenir un \
              échantillon représentatif des performances que nous pourrions atteindre sur \
-             l'ensemble du Stanford Dogs Dataset.")
+             l'ensemble du Stanford Dogs Dataset."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     
     # Liste des étiquettes sélectionnées
     selected_dirs = selection_classes
@@ -370,13 +383,15 @@ elif page == pages[2]:
             plt.tight_layout()
             st.pyplot(plt)  # Afficher le graphique dans Streamlit
     else:
-        st.write("Aucune étiquette sélectionnée. Veuillez en sélectionner au moins une dans la barre latérale.")
+        texte = "Aucune étiquette sélectionnée. Veuillez en sélectionner au moins une dans la barre latérale."
+        st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
     # Section sur l'explication de l'utilisation de YOLOV9 dans le nettoyage du Dataset
     st.write("### Identification des chiens avec YOLOV9")
-    st.write("Nous avons ensuite utilisé YOLOv9 pour déterminer la présence de chiens dans les images. \
+    texte = "Nous avons ensuite utilisé YOLOv9 pour déterminer la présence de chiens dans les images. \
              En effet, celles-ci peuvent contenir non seulement des chiens, mais aussi des humains, \
-             d'autres animaux ou même des objets.")
+             d'autres animaux ou même des objets."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     # Chemin d'accès de l'image
     image_path = "n02088094_294.jpg"
     # Charger l'image à partir du chemin d'accès
@@ -385,10 +400,11 @@ elif page == pages[2]:
     st.image(img, width=300)
 
     # Affichage des images originales
-    st.write("Ensuite, nous avons utilisé ces détections pour conserver uniquement les régions \
+    texte = "Ensuite, nous avons utilisé ces détections pour conserver uniquement les régions \
              contenant des chiens dans les images. L'objectif était de recadrer les images afin \
              de focaliser l'attention sur les éléments les plus pertinents pour la classification \
-             des races de chiens. Ci-dessous, vous pouvez voir les images une fois recadrées :")
+             des races de chiens. Ci-dessous, vous pouvez voir les images une fois recadrées :"
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     # Chemin du dossier contenant les images détectées
     images_detect_dir = "./dogs_detection_15"
 
@@ -425,9 +441,10 @@ elif page == pages[2]:
     st.write("### Réduction du bruit via RMBG 1.4 de BRIA AI")
 
     # Affichage des images détourées
-    st.write("Enfin, afin de réduire au maximum le bruit dans les images, nous avons opté pour \
+    texte = "Enfin, afin de réduire au maximum le bruit dans les images, nous avons opté pour \
              l'utilisation du modèle de Bria AI (RMBG 1.4), qui offre la possibilité de détourer l'image. \
-             Vous pouvez voir ci-dessous les images recadrées et détourées :")
+             Vous pouvez voir ci-dessous les images recadrées et détourées :"
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     
     # Chemin du dossier contenant les images détourées
     images_cutout_dir = "./dogs_cutout_15"
@@ -456,14 +473,15 @@ elif page == pages[3]:
     # Titre de la page
     st.title('Choix du modèle')
     st.write('### Modèle VGG16 baseline')
-    st.write("Pour notre modèle de base, nous avons opté pour le modèle VGG16, \
+    texte = "Pour notre modèle de base, nous avons opté pour le modèle VGG16, \
              qui a été préalablement entraîné sur les données d'ImageNet. \
              Notre ensemble de données est également issu d'ImageNet, \
              ce qui constitue une base solide pour la classification des \
              différentes races de chiens. Nous avons entraîné ce modèle \
              pré-entraîné sur les images brutes, c'est-à-dire non nettoyées. \
              Mais nous avons utilisé les couches d'input de VGG16 pour \
-             le preprocessing de celles-ci.")
+             le preprocessing de celles-ci."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     
     # Chemin d'accès de l'évaluation VGG16
     img1 = "./Images_streamlit/VGG16_evaluate.png"
@@ -486,13 +504,15 @@ elif page == pages[3]:
     st.image(img, width=800)
 
     # Explication des résultats
-    st.write("Lors de son entraînement, VGG16 a tendance à présenter des signes de surapprentissage, \
+    texte = "Lors de son entraînement, VGG16 a tendance à présenter des signes de surapprentissage, \
              même avec l'utilisation d'un EarlyStopping pour limiter le nombre d'epochs. Cependant, \
              cette tendance est mieux comprise lorsque nous examinons les scores de la matrice de confusion. \
              Comme prévu avec l'échantillonnage des 15 races de chiens, le modèle éprouve des difficultés \
-             à distinguer les races similaires.")
-    st.write("Cette baseline nous fournit un premier score à partir duquel nous allons pouvoir évaluer les \
-             performances de YOLOv9, ainsi que l'impact de notre processus de nettoyage préalable.")
+             à distinguer les races similaires."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
+    texte = "Cette baseline nous fournit un premier score à partir duquel nous allons pouvoir évaluer les \
+             performances de YOLOv9, ainsi que l'impact de notre processus de nettoyage préalable."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
     # Modèle YOLOV9 sur les images non détourées
     st.write('### Modèle YOLOv9 sur les images non détourées')
@@ -518,11 +538,12 @@ elif page == pages[3]:
     st.image(img, width=1000)
 
     # Explication des résultats
-    st.write("Le modèle YOLOv9 a été entraîné sur 70 epochs en utilisant les images non détourées, \
-             aboutissant à une précision maximale de 0.6. Cette performance n'est pas nécessairement \
-             supérieure à celle du modèle VGG16. Cependant, une analyse plus approfondie de la matrice \
+    texte = "Le modèle YOLOv9 a été entraîné sur 70 epochs en utilisant les images non détourées, \
+             aboutissant à une accuracy de 0.63. Cette performance est inférieure à celle du modèle VGG16. \
+             Cependant, une analyse plus approfondie de la matrice \
              de confusion révèle que le modèle commence à discerner les races de chiens, bien qu'il \
-             éprouve encore des difficultés avec les races similaires.")
+             éprouve encore des difficultés avec les races similaires."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
     # Modèle YOLOV9 sur les images détourées
     st.write('### Modèle YOLOV9 sur les images détourées')
@@ -548,18 +569,19 @@ elif page == pages[3]:
     st.image(img, width=1000)
 
         # Explication des résultats
-    st.write("Ensuite, nous avons entraîné le modèle YOLOv9 sur les images détourées, \
+    texte = "Ensuite, nous avons entraîné le modèle YOLOv9 sur les images détourées, \
              ce qui a donné des résultats améliorés sur le même nombre d'epochs (70). \
-             Cependant, il était évident que la précision pouvait être davantage améliorée \
-             en augmentant le nombre d'epochs, tout en surveillant le risque de surapprentissage.")
-    st.write(" Par conséquent, nous avons augmenté le nombre d'epochs à 100, ce qui nous a permis d'atteindre \
-              une précision d'environ 0.8. De plus, l'analyse de la matrice de confusion révèle une \
-             amélioration dans la reconnaissance des races de chiens similaires, \
-             ainsi qu'une amélioration globale des classifications.")
+             Cependant, nous avons augmenté le nombre d'epochs à 100 pour tenter de faire en sorte que \
+             le modèle puisse s'améliorer sur la classification des races de chiens similaires."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
+    texte = "Cela nous a permis d'atteindre une accuracy de 0.73. De plus, l'analyse de la matrice de confusion révèle une \
+             amélioration dans la reconnaissance des races de chiens similaires."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
     st.write('### Conclusion')
-    st.write("Le modèle YOLOv9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
-             Nous allons donc choisir ce modèle.")
+    texte = "Le modèle YOLOv9 entraîné sur les images détourées permet d'obtenir le meilleur score. \
+             Nous allons donc choisir ce modèle."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
     
     # Liste des races de chiens disponibles
     dog_breeds = os.listdir(data_test_dir)
@@ -638,14 +660,15 @@ elif page == pages[3]:
                 exp_dir_path = os.path.join(exp_folder, exp_dir)
                 shutil.rmtree(exp_dir_path)
     else:
-        st.markdown("_Veuillez sélectionner les paramètres sur la barre latérale gauche,\
-                     puis cliquer sur '**Prédire**' afin d'afficher les prédictions._")
+        texte = "<i>Veuillez sélectionner les paramètres sur la barre latérale gauche,\
+                     puis cliquer sur '<B>Prédire</B>' afin d'afficher les prédictions.<i>"
+        st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
 elif page == pages[4]:
     st.title("Prédiction du modèle")
-
-    st.write("Vous pouvez choisir une image dans la banque d'images mise à disposition \
-             ou bien uploader directement une image pour tester le modèle YOLOv9.")
+    texte = "Vous pouvez choisir une image dans la banque d'images mise à disposition \
+             ou bien uploader directement une image pour tester le modèle YOLOv9."
+    st.markdown(f'<p style="font-size:{text_size}%">{texte}</p>', unsafe_allow_html=True)
 
     images_dir = os.path.join('./Images_test')
 
