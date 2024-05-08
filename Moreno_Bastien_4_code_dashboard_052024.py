@@ -15,7 +15,7 @@ import shutil
 
 # Lien vers le Dashboard en ligne : https://dashboard-yolov9.streamlit.app/
 
-# Fonction copiée du fichier detect.py (car impossible de lancer une ligne de commande sur streamlit en ligne)
+# Fonction copiée du fichier detect.py
 import platform
 import sys
 from pathlib import Path
@@ -186,7 +186,7 @@ def run(
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
 
 ######################################################################
-# Téléchargement du modèle
+# Téléchargement du modèle sur mon drive car l'utilisation de LFS sur git donne un pointer et non un fichier
 import gdown
 
 # Lien direct vers le fichier sur Google Drive
