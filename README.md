@@ -81,7 +81,7 @@ python export.py --source chemin_vers_images --weights best.pt --output chemin_v
 ```
 
 ### Classification avec VGG16
-Pour classifier des images de chiens avec VGG16, chargez les modèles et utilisez les scripts dans le notebook Moreno_Bastien_2_notebook_052024.ipynb.
+Pour classifier des images de chiens avec VGG16, chargez les modèles et utilisez les scripts dans le notebook `Moreno_Bastien_2_notebook_052024.ipynb`.
 
 ### Dashboard Streamlit
 Vous pouvez lancer le Dashboard en local : 
