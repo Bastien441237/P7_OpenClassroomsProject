@@ -22,7 +22,7 @@ Dans le cadre du modèle YOLOv9 et du Stanford Dogs Dataset, réaliser le nettoy
 2. **Un modèle YOLOV9** pour la détection des chiens.
 2. **Un modèle VGG16** pour la classification des races de chiens.
 3. **Un notebook Jupyter** contenant les scripts de preprocessing, de détection, et de classification.
-4. **Un dashboard Streamlit** pour la visualisation interactive des résultats.
+4. **Un dashboard Streamlit en ligne** pour la visualisation interactive des résultats.
 5. **Une présentation** résumant les méthodes et les résultats du projet.
 
 ## 📂 Structure du Repository
