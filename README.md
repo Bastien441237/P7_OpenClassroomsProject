@@ -1,6 +1,6 @@
 # 🐶 Preuve de Concept – Classification d'Images avec YOLOv9
 
-Bienvenue dans le repository du projet **Preuve de Concept – Classification d'Images avec YOLOv9**. Ce projet utilise des modèles de deep learning pour détecter et classifier des images de chiens. Les images proviennent du Stanford Dogs Dataset et d'autres sources.
+Bienvenue dans le repository du projet **Preuve de Concept – Classification d'Images avec YOLOv9**. Ce projet utilise des modèles de deep learning pour détecter et classifier des images de chiens. Les images proviennent du Stanford Dogs Dataset.
 
 ## 📚 Contexte du Projet
 
