@@ -70,7 +70,11 @@ pip install -r requirements.txt
 
 ## 🧑‍💻 Utilisation
 ### Détection avec YOLOV9
-Pour détecter des chiens dans des images avec YOLOV9, utilisez le script export.py :
+
+Pour plus de détails sur le code source et l'utilisation de YOLOv9 :
+https://github.com/WongKinYiu/yolov9
+
+Pour détecter des chiens dans des images avec YOLOv9, utilisez le script export.py :
 ```
 python export.py --source chemin_vers_images --weights best.pt --output chemin_vers_sortie
 ```
