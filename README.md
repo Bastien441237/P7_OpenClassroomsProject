@@ -89,7 +89,7 @@ Vous pouvez lancer le Dashboard en local :
 streamlit run Moreno_Bastien_4_code_dashboard_052024.py
 ```
 
-ou bien la consulter en ligne ici 👆 : [![Streamlit Logo](https://img.shields.io/badge/Streamlit-%23FF4B4B.svg?logo=streamlit&logoColor=white)](https://dashboard-yolov9.streamlit.app/
+ou bien le consulter en ligne ici 👆 : [![Streamlit Logo](https://img.shields.io/badge/Streamlit-%23FF4B4B.svg?logo=streamlit&logoColor=white)](https://dashboard-yolov9.streamlit.app/
 )
 
 ## 👨‍💻 Auteur
