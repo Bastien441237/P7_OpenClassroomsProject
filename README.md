@@ -10,7 +10,8 @@ Dans le cadre du modèle YOLOv9 et du Stanford Dogs Dataset, réaliser le nettoy
 ## 🎯 Objectifs du Projet
 
 1. **Détecter les chiens dans les images à l'aide du modèle YOLOV9 et les isoler (cropping) afin de nettoyer la donnée.**
-![Image d'Inférence](https://github.com/Bastien441237/P7_OpenClassroomsProject/blob/main/n02088094_294.jpg)
+<img src="https://github.com/Bastien441237/P7_OpenClassroomsProject/blob/main/n02088094_294.jpg" alt="Image d'Inférence" width="400"/>
+
 2. **Réentrainer YOLOV9 sur les données nettoyées**
 3. **Classifier les races de chiens détectées à l'aide du modèle VGG16.**
 4. **Comparer les deux modèles**
