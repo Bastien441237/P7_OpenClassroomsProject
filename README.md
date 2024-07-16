@@ -4,7 +4,8 @@ Bienvenue dans le repository du projet **Preuve de Concept – Classification d'
 
 ## 📚 Contexte du Projet
 
-Réaliser une preuve de concept avec le modèle YOLOV9, nettoyage des images avec détection des chiens (cropping) puis réentraînement du modèle pour différencier les races de chiens. L'idée est de réussire à prouver qu'un modèle de détection d'objet peut être meilleur qu'un modèle de classification dans la prédiction de races de chiens.  
+Réaliser une preuve de concept avec un modèle récent de Deep Learning et réutiliser un Dataset des projets précédents.\
+Dans le cadre du modèle YOLOv9 et du Stanford Dogs Dataset, réaliser le nettoyage des images avec détection des chiens (cropping) puis réentraînement du modèle pour différencier les races de chiens. L'idée est de réussire à prouver qu'un modèle de détection d'objet peut être meilleur qu'un modèle de classification dans la prédiction de races de chiens.  
 
 ## 🎯 Objectifs du Projet
 
